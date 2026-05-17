@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security+ Sentinel — SY0-701</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f1117;--bg2:#161b27;--card:#1a1f2e;--card2:#1e2436;
+    --border:#252d3d;--border2:#2e3750;
+    --text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;--white:#ffffff;
+    --accent:#6366f1;--accent-h:#7c7ffc;--accent-g:linear-gradient(135deg,#6366f1,#818cf8);
+    --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--purple:#a855f7;--cyan:#06b6d4;
+  }
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  #root{min-height:100vh;display:flex;flex-direction:column}
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  @keyframes spin   {to{transform:rotate(360deg)}}
+  @keyframes fadeUp {from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn {from{opacity:0}to{opacity:1}}
+  @keyframes pulse  {0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+  @keyframes tooltipIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+  .anim-up{animation:fadeUp .3s ease both}
+  .anim-in{animation:fadeIn .2s ease both}
+
+  /* ── NAVBAR ── */
+  .navbar{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:60px;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+
+  /* ── CARDS ── */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .card-p{padding:20px}
+
+  /* ── BUTTONS ── */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;border-radius:12px;border:none;cursor:pointer;transition:all .18s ease;padding:11px 20px;letter-spacing:-.01em;white-space:nowrap;line-height:1}
+  .btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+  .btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 4px 16px rgba(99,102,241,.35)}
+  .btn-primary:hover{filter:brightness(1.1);box-shadow:0 6px 24px rgba(99,102,241,.5);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border)}
+  .btn-ghost:hover{background:var(--card);color:var(--text);border-color:var(--border2)}
+  .btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+  .btn-danger:hover{background:rgba(239,68,68,.22)}
+  .btn-success{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25)}
+  .btn-success:hover{background:rgba(34,197,94,.22)}
+
+  /* ── MODE SELECTOR ── */
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .mode-btn{background:var(--card2);border:2px solid var(--border);border-radius:14px;padding:20px 12px 16px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:10px;font-family:inherit}
+  .mode-btn:hover{border-color:var(--border2);background:var(--card)}
+  .mode-btn.active{border-color:var(--accent);background:rgba(99,102,241,.1);box-shadow:0 0 0 1px var(--accent) inset}
+  .mode-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.05)}
+  .mode-btn.active .mode-icon{background:rgba(99,102,241,.2)}
+  .mode-label{font-size:13px;font-weight:600;color:var(--muted2)}
+  .mode-btn.active .mode-label{color:var(--white)}
+
+  /* ── CHIPS ── */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;background:var(--card2);border:1px solid var(--border2);color:var(--muted2);cursor:pointer;transition:all .15s}
+  .chip:hover{background:var(--border2);color:var(--text)}
+  .chip.active{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.5);color:#818cf8;font-weight:600}
+
+  /* ── INPUT ── */
+  .topic-input{width:100%;padding:14px 16px;border-radius:12px;background:var(--bg2);border:1.5px solid var(--border2);color:var(--white);font-family:inherit;font-size:15px;font-weight:500;outline:none;transition:border-color .18s}
+  .topic-input:focus{border-color:var(--accent)}
+  .topic-input::placeholder{color:var(--muted)}
+
+  /* ── GEN BTN ── */
+  .gen-btn{width:100%;padding:16px;font-size:16px;border-radius:14px;background:var(--accent-g);color:#fff;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 24px rgba(99,102,241,.4);transition:all .2s;font-family:inherit;letter-spacing:-.01em}
+  .gen-btn:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 8px 32px rgba(99,102,241,.5)}
+  .gen-btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ── SCORE ── */
+  .score-row{display:flex;align-items:center;gap:12px}
+  .score-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;min-width:60px}
+  .score-fill{height:100%;border-radius:3px;transition:width .5s ease}
+
+  /* ── FLASHCARD ── */
+  .flashcard{border-radius:18px;min-height:210px;padding:32px 28px;cursor:pointer;position:relative;overflow:visible;display:flex;flex-direction:column;justify-content:center;transition:transform .15s,box-shadow .15s;border:1.5px solid var(--border2);background:var(--card2)}
+  .flashcard:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+  .flashcard.front{background:linear-gradient(135deg,rgba(99,102,241,.08) 0%,var(--card2) 100%)}
+  .flashcard.back{background:linear-gradient(135deg,rgba(34,197,94,.06) 0%,var(--card2) 100%)}
+
+  /* ── QUIZ OPTS ── */
+  .opt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:all .18s}
+  .opt:hover:not(.locked){border-color:var(--border2);background:var(--card2)}
+  .opt.selected{border-color:rgba(99,102,241,.6);background:rgba(99,102,241,.08)}
+  .opt.correct{border-color:rgba(34,197,94,.6);background:rgba(34,197,94,.07)}
+  .opt.wrong{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.07)}
+  .opt-letter{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;background:var(--border2);color:var(--muted2);transition:all .18s}
+  .opt.selected .opt-letter{background:var(--accent);color:#fff}
+  .opt.correct  .opt-letter{background:var(--green);color:#000}
+  .opt.wrong    .opt-letter{background:var(--red);color:#fff}
+
+  /* ── MISC ── */
+  .dot-row{display:flex;gap:5px;align-items:center}
+  .dot{height:4px;border-radius:2px;transition:all .3s;background:var(--border2)}
+  .spinner{width:34px;height:34px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--accent);animation:spin .7s linear infinite}
+  .section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 10px;border-radius:20px}
+  .pill-accent{background:rgba(99,102,241,.15);color:#818cf8;border:1px solid rgba(99,102,241,.3)}
+  .divider{height:1px;background:var(--border);margin:0}
+  .mnem-chip{padding:6px 14px;border-radius:10px;font-size:13px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+  .exam-tip{padding:14px 16px;border-radius:12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.6;color:var(--text)}
+  .gdot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;flex-shrink:0}
+  .domain-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;background:var(--card2);border:1px solid var(--border2);color:var(--muted2)}
+  .domain-badge:hover{border-color:var(--border2);color:var(--text);background:var(--border2)}
+  .domain-badge.active{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.12);color:#818cf8}
+  .result-pct{font-size:80px;font-weight:900;letter-spacing:-.04em;line-height:1}
+  .prog{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+  .prog-fill{height:100%;border-radius:2px;transition:width .4s ease;background:linear-gradient(90deg,var(--accent),#818cf8)}
+  @media(max-width:480px){.mode-label{display:none}.mode-btn{padding:16px 8px}}
+
+  /* ══════════════════════════════════════════════
+     TERM HIGHLIGHTING & TOOLTIP
+  ══════════════════════════════════════════════ */
+  .term {
+    color: #a5b4fc;
+    border-bottom: 1px dotted rgba(165,180,252,.5);
+    cursor: help;
+    position: relative;
+    display: inline;
+    font-weight: inherit;
+    transition: color .15s, border-color .15s;
+  }
+  .term:hover { color: #c4b5fd; border-bottom-color: #c4b5fd; }
+
+  /* Unknown acronyms get a distinct amber style */
+  .term-acronym {
+    color: #fbbf24 !important;
+    border-bottom: 1px dotted rgba(251,191,36,.5) !important;
+  }
+  .term-acronym:hover { color: #fcd34d !important; border-bottom-color: #fcd34d !important; }
+
+  /* Tooltip bubble */
+  .term-tooltip {
+    position: fixed;
+    z-index: 9999;
+    max-width: 280px;
+    min-width: 180px;
+    background: #1e2436;
+    border: 1px solid rgba(165,180,252,.35);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.6), 0 0 0 1px rgba(165,180,252,.08);
+    pointer-events: none;
+    animation: tooltipIn .18s ease both;
+  }
+  .tt-term {
+    font-size: 11px; font-weight: 800; letter-spacing: .08em;
+    text-transform: uppercase; color: #a5b4fc; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tt-term::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:#a5b4fc; flex-shrink:0; }
+  .tt-body { font-size: 13px; line-height: 1.55; color: var(--text); }
+  .tt-type {
+    margin-top: 7px; font-size: 10px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+// ─── GLOSSARY ─────────────────────────────────────────────────────────────────
+// Sorted longest-first so multi-word terms match before subsets
+const GLOSSARY_RAW = [
+  // Acronyms & multi-word first
+  ["Zero Trust Architecture","A security model that assumes no user or device is trusted by default, requiring continuous verification regardless of network location.","Model"],
+  ["Zero-Day Exploit","An attack that targets a vulnerability before the vendor has released a patch, giving defenders zero days to prepare.","Attack"],
+  ["Supply Chain Attack","A cyberattack that targets a less-secure element in the supply chain to compromise a larger organization downstream.","Attack"],
+  ["Social Engineering","Psychological manipulation of people into divulging confidential information or performing actions that compromise security.","Technique"],
+  ["Penetration Testing","An authorized simulated cyberattack on a system to evaluate security by identifying exploitable vulnerabilities.","Assessment"],
+  ["Privileged Access Management","PAM — Controls and monitors access for accounts with elevated system permissions to reduce insider threat risk.","Control"],
+  ["Multi-Factor Authentication","MFA — Requires two or more verification factors (something you know, have, or are) before granting access.","Control"],
+  ["Incident Response","A structured process for detecting, containing, eradicating, and recovering from security incidents.","Process"],
+  ["Business Continuity","Planning and procedures that ensure critical business functions continue during and after a disaster or disruption.","Framework"],
+  ["Disaster Recovery","Policies and procedures for restoring IT systems and data after a catastrophic event.","Framework"],
+  ["Network Segmentation","Dividing a network into isolated subnetworks to limit lateral movement and contain breaches.","Control"],
+  ["Threat Intelligence","Evidence-based knowledge about existing or emerging threats used to inform security decisions.","Concept"],
+  ["Vulnerability Scanning","Automated testing of systems to identify known security weaknesses without exploiting them.","Assessment"],
+  ["Digital Forensics","The process of collecting, preserving, and analyzing electronic evidence to investigate security incidents.","Process"],
+  ["Data Loss Prevention","DLP — Technology that detects and prevents unauthorized transmission or exfiltration of sensitive data.","Control"],
+  ["Security Information and Event Management","SIEM — Aggregates and correlates logs from multiple sources to detect and alert on security events in real time.","Tool"],
+  ["Business Impact Analysis","BIA — Identifies critical business functions and quantifies the potential impact of disruptions on each.","Assessment"],
+  ["Risk Management Framework","RMF — A structured process (NIST SP 800-37) for integrating security and risk management into system development.","Framework"],
+  ["Access Control List","ACL — A set of rules that specifies which users or systems are granted or denied access to a resource.","Control"],
+  ["Certificate Authority","CA — A trusted entity that issues digital certificates to verify the identity of individuals or systems.","Infrastructure"],
+  ["Public Key Infrastructure","PKI — A framework of hardware, software, policies, and standards used to manage digital certificates and encryption keys.","Infrastructure"],
+  ["Intrusion Detection System","IDS — Monitors network or host activity for malicious behavior and generates alerts.","Tool"],
+  ["Intrusion Prevention System","IPS — Monitors and actively blocks malicious network traffic in real time.","Tool"],
+  ["Endpoint Detection and Response","EDR — Security software that continuously monitors endpoints to detect and respond to threats.","Tool"],
+  ["Security Operations Center","SOC — A centralized team that monitors, detects, analyzes, and responds to cybersecurity incidents.","Team"],
+  ["Role-Based Access Control","RBAC — Assigns permissions to roles rather than individuals; users inherit access based on their role.","Model"],
+  ["Mandatory Access Control","MAC — Access decisions are made by the system based on security labels, not user discretion.","Model"],
+  ["Discretionary Access Control","DAC — Resource owners control access to their own resources and can grant permissions to others.","Model"],
+  ["Attribute-Based Access Control","ABAC — Access is granted based on attributes (user, resource, environment) evaluated against policies.","Model"],
+  ["Defense in Depth","A layered security strategy using multiple controls so that if one fails, others still protect the asset.","Strategy"],
+  ["Least Privilege","The principle that users and systems should have only the minimum permissions needed to perform their function.","Principle"],
+  ["Separation of Duties","Requiring more than one person to complete a sensitive task to reduce fraud and error risk.","Principle"],
+  ["Security Awareness Training","Programs that educate employees about security threats, policies, and safe behaviors.","Control"],
+  ["Threat Hunting","Proactive search through networks and systems to detect advanced threats that evade automated tools.","Process"],
+  ["Man-in-the-Middle","MitM — An attacker secretly intercepts and potentially alters communications between two parties.","Attack"],
+  ["Distributed Denial of Service","DDoS — Floods a target with traffic from many sources simultaneously to exhaust resources and cause downtime.","Attack"],
+  ["SQL Injection","An attack that inserts malicious SQL code into input fields to manipulate database queries.","Attack"],
+  ["Cross-Site Scripting","XSS — Injects malicious scripts into web pages viewed by other users to steal data or hijack sessions.","Attack"],
+  ["Ransomware","Malware that encrypts victim data and demands payment for the decryption key.","Malware"],
+  ["Spear Phishing","A targeted phishing attack directed at a specific individual or organization using personalized information.","Attack"],
+  ["Credential Stuffing","Using stolen username/password pairs from one breach to attempt logins on other services.","Attack"],
+  ["Password Spraying","Trying a small number of common passwords against many accounts to avoid account lockout.","Attack"],
+  ["Brute Force","Systematically trying all possible password combinations until the correct one is found.","Attack"],
+  ["Rainbow Table","A precomputed table of password hashes used to crack hashed passwords quickly.","Tool"],
+  ["DNS Poisoning","Corrupting a DNS cache with false records to redirect users to malicious sites.","Attack"],
+  ["ARP Poisoning","Sending fake ARP messages to link an attacker's MAC address with a legitimate IP, enabling MitM attacks.","Attack"],
+  ["Session Hijacking","Taking over an authenticated user session by stealing or forging session tokens.","Attack"],
+  ["Vishing","Voice-based phishing that uses phone calls to trick victims into revealing sensitive information.","Attack"],
+  ["Smishing","SMS-based phishing that uses text messages containing malicious links or requests for information.","Attack"],
+  ["Phishing","Fraudulent communications (usually email) that appear to come from legitimate sources to steal credentials.","Attack"],
+  ["Watering Hole","An attack that compromises a website frequently visited by the target group to infect visitors.","Attack"],
+  ["Pretexting","Creating a fabricated scenario to manipulate a target into divulging information or taking an action.","Technique"],
+  ["Tailgating","Physically following an authorized person into a restricted area without proper credentials.","Attack"],
+  ["Kerberos","A network authentication protocol that uses tickets to allow nodes to prove identity in a secure manner.","Protocol"],
+  ["LDAP","Lightweight Directory Access Protocol — Used to access and maintain distributed directory information services.","Protocol"],
+  ["RADIUS","Remote Authentication Dial-In User Service — A networking protocol for centralized authentication of remote users.","Protocol"],
+  ["SAML","Security Assertion Markup Language — An XML standard for exchanging authentication and authorization data.","Protocol"],
+  ["OAuth","An open standard authorization framework that allows third-party applications to access resources without exposing credentials.","Protocol"],
+  ["OpenID Connect","An identity layer built on OAuth 2.0 that allows clients to verify user identity via an authorization server.","Protocol"],
+  ["OIDC","OpenID Connect — An identity layer on top of OAuth 2.0 for federated authentication.","Protocol"],
+  ["DNSSEC","DNS Security Extensions — Adds cryptographic signatures to DNS records to prevent DNS poisoning.","Protocol"],
+  ["HTTPS","Hypertext Transfer Protocol Secure — HTTP over TLS/SSL, encrypting web communications.","Protocol"],
+  ["SFTP","Secure File Transfer Protocol — Transfers files over an encrypted SSH connection.","Protocol"],
+  ["FTPS","FTP Secure — FTP with added support for TLS encryption.","Protocol"],
+  ["SNMP","Simple Network Management Protocol — Used to monitor and manage network devices; v3 adds security.","Protocol"],
+  ["IPSec","Internet Protocol Security — A suite of protocols that encrypts and authenticates IP packets at the network layer.","Protocol"],
+  ["TLS","Transport Layer Security — A cryptographic protocol providing secure communication over a network (successor to SSL).","Protocol"],
+  ["SSL","Secure Sockets Layer — The deprecated predecessor to TLS; still referenced colloquially for HTTPS.","Protocol"],
+  ["SSH","Secure Shell — A cryptographic protocol for operating network services securely over an unsecured network.","Protocol"],
+  ["WPA3","Wi-Fi Protected Access 3 — The latest Wi-Fi security protocol with stronger encryption than WPA2.","Protocol"],
+  ["WPA2","Wi-Fi Protected Access 2 — Uses AES encryption; the current standard for securing wireless networks.","Protocol"],
+  ["SPF","Sender Policy Framework — A DNS record specifying which mail servers are authorized to send email for a domain.","Protocol"],
+  ["DKIM","DomainKeys Identified Mail — Adds a digital signature to email headers to verify sender authenticity.","Protocol"],
+  ["DMARC","Domain-based Message Authentication, Reporting & Conformance — Builds on SPF and DKIM to enforce email policies.","Protocol"],
+  ["AES","Advanced Encryption Standard — A symmetric block cipher used globally for encrypting sensitive data.","Algorithm"],
+  ["RSA","Rivest–Shamir–Adleman — An asymmetric encryption algorithm widely used for secure data transmission.","Algorithm"],
+  ["SHA","Secure Hash Algorithm — A family of cryptographic hash functions (SHA-256, SHA-3) used for data integrity.","Algorithm"],
+  ["MD5","Message Digest 5 — A widely used but cryptographically broken hash function; not recommended for security use.","Algorithm"],
+  ["ECC","Elliptic Curve Cryptography — An asymmetric algorithm offering strong security with smaller key sizes than RSA.","Algorithm"],
+  ["DES","Data Encryption Standard — A symmetric key algorithm now considered insecure due to short key length (56-bit).","Algorithm"],
+  ["3DES","Triple DES — Applies DES cipher three times to each block; stronger than DES but slower than AES.","Algorithm"],
+  ["Diffie-Hellman","A key exchange protocol that allows two parties to establish a shared secret over an insecure channel.","Algorithm"],
+  ["HMAC","Hash-based Message Authentication Code — Combines a hash function and a secret key to verify data integrity and authenticity.","Algorithm"],
+  ["VPN","Virtual Private Network — Encrypts network traffic between a client and server, creating a secure tunnel over the internet.","Technology"],
+  ["VLAN","Virtual Local Area Network — Logically segments a physical network to isolate traffic between groups.","Technology"],
+  ["NAC","Network Access Control — Enforces security policy compliance before allowing devices to connect to the network.","Technology"],
+  ["WAF","Web Application Firewall — Filters and monitors HTTP traffic to protect web applications from common attacks.","Technology"],
+  ["DLP","Data Loss Prevention — Technology that prevents unauthorized transmission of sensitive data outside the organization.","Technology"],
+  ["SIEM","Security Information and Event Management — Collects and analyzes log data to identify and respond to threats.","Technology"],
+  ["SOAR","Security Orchestration, Automation and Response — Automates security workflows to accelerate incident response.","Technology"],
+  ["EDR","Endpoint Detection and Response — Monitors endpoints to detect, investigate, and remediate threats.","Technology"],
+  ["XDR","Extended Detection and Response — Integrates data from endpoints, networks, and cloud for unified threat detection.","Technology"],
+  ["MDM","Mobile Device Management — Remotely manages and secures employee mobile devices enforcing corporate policies.","Technology"],
+  ["IAM","Identity and Access Management — Framework for managing digital identities and controlling access to resources.","Framework"],
+  ["PAM","Privileged Access Management — Secures, controls, and monitors access to critical systems by privileged accounts.","Framework"],
+  ["MFA","Multi-Factor Authentication — Requires multiple forms of verification to authenticate a user's identity.","Control"],
+  ["2FA","Two-Factor Authentication — A subset of MFA using exactly two verification factors.","Control"],
+  ["SSO","Single Sign-On — Allows users to authenticate once and gain access to multiple systems without re-entering credentials.","Control"],
+  ["BYOD","Bring Your Own Device — A policy allowing employees to use personal devices for work, requiring security management.","Policy"],
+  ["DRP","Disaster Recovery Plan — A documented process to recover and protect IT infrastructure in the event of a disaster.","Framework"],
+  ["BCP","Business Continuity Plan — A plan to ensure critical operations continue during and after a disruption.","Framework"],
+  ["RPO","Recovery Point Objective — The maximum acceptable amount of data loss measured in time after a disaster.","Metric"],
+  ["RTO","Recovery Time Objective — The maximum acceptable time to restore a system or process after a disruption.","Metric"],
+  ["MTTR","Mean Time to Repair — Average time required to restore a system after a failure.","Metric"],
+  ["MTBF","Mean Time Between Failures — Average time between system failures, indicating reliability.","Metric"],
+  ["CVE","Common Vulnerabilities and Exposures — A publicly maintained list of known cybersecurity vulnerabilities.","Standard"],
+  ["CVSS","Common Vulnerability Scoring System — Provides a numerical score (0–10) representing the severity of a vulnerability.","Standard"],
+  ["OWASP","Open Web Application Security Project — A nonprofit providing free resources on web application security.","Standard"],
+  ["NIST","National Institute of Standards and Technology — Publishes cybersecurity frameworks, guidelines, and standards.","Standard"],
+  ["GDPR","General Data Protection Regulation — EU regulation governing the collection and processing of personal data.","Regulation"],
+  ["HIPAA","Health Insurance Portability and Accountability Act — US law protecting the privacy and security of health information.","Regulation"],
+  ["PCI-DSS","Payment Card Industry Data Security Standard — Security standards for organizations handling credit card data.","Standard"],
+  ["SOX","Sarbanes-Oxley Act — US law requiring accurate financial disclosures and internal security controls for public companies.","Regulation"],
+  ["FedRAMP","Federal Risk and Authorization Management Program — A US government program for cloud security authorization.","Standard"],
+  ["CMMC","Cybersecurity Maturity Model Certification — DoD framework requiring defense contractors to implement cybersecurity controls.","Standard"],
+  ["ISO 27001","International standard specifying requirements for establishing, implementing, and maintaining an information security management system (ISMS).","Standard"],
+  ["Zero Trust","A security philosophy of 'never trust, always verify' — no implicit trust is granted based on network location.","Model"],
+  ["IOC","Indicator of Compromise — Forensic evidence that suggests a system may have been compromised.","Concept"],
+  ["TTPs","Tactics, Techniques, and Procedures — Describes the behavior and methods of a threat actor.","Concept"],
+  ["APT","Advanced Persistent Threat — A prolonged, stealthy cyberattack by a sophisticated actor targeting a specific entity.","Threat"],
+  ["IoT","Internet of Things — Network of physical devices embedded with sensors and software that connect and exchange data.","Technology"],
+  ["API","Application Programming Interface — A set of rules allowing different software applications to communicate.","Technology"],
+  ["SDK","Software Development Kit — A set of tools for building applications for a specific platform or framework.","Technology"],
+  ["FIDO2","Fast Identity Online 2 — A standard for passwordless authentication using public key cryptography.","Standard"],
+  ["PIV","Personal Identity Verification — A US government smart card standard for strong authentication.","Standard"],
+  ["CAC","Common Access Card — A smart card used by the US Department of Defense for identification and authentication.","Standard"],
+  ["TOTP","Time-based One-Time Password — Generates a temporary code using a shared secret and current time for MFA.","Algorithm"],
+  ["HOTP","HMAC-based One-Time Password — Generates a one-time password using a counter and shared secret.","Algorithm"],
+  ["Hashing","A one-way function that converts input data into a fixed-length string; used for integrity verification.","Concept"],
+  ["Salting","Adding random data to a password before hashing to prevent rainbow table attacks.","Technique"],
+  ["Encryption","The process of converting plaintext into ciphertext using an algorithm and key, making it unreadable without the key.","Concept"],
+  ["Symmetric Encryption","Uses the same key for both encryption and decryption; fast but requires secure key exchange.","Concept"],
+  ["Asymmetric Encryption","Uses a public key to encrypt and a private key to decrypt; eliminates the need for shared secret key exchange.","Concept"],
+  ["Digital Signature","A cryptographic mechanism that verifies the authenticity and integrity of a message using asymmetric keys.","Concept"],
+  ["Non-repudiation","The assurance that a party cannot deny the authenticity of their digital signature or a message they sent.","Concept"],
+  ["Certificate Pinning","A technique that associates a host with its expected certificate to prevent MITM attacks via fraudulent certs.","Technique"],
+  ["Key Escrow","A system where cryptographic keys are held by a third party and can be retrieved if the original keys are lost.","Concept"],
+  ["Steganography","Hiding secret data within ordinary, non-secret files or messages to avoid detection.","Technique"],
+  ["Obfuscation","Making code or data difficult to understand to hinder reverse engineering or analysis.","Technique"],
+  ["Fuzzing","An automated testing technique that inputs random or invalid data to find software vulnerabilities.","Technique"],
+  ["Sandbox","An isolated environment used to safely execute and analyze potentially malicious code without risk to the host.","Technology"],
+  ["Honeypot","A decoy system designed to attract attackers, detect intrusion attempts, and gather intelligence.","Technology"],
+  ["Honeynet","A network of honeypots designed to simulate a real network and attract attackers for observation.","Technology"],
+  ["OSINT","Open Source Intelligence — Information gathered from publicly available sources for security research or reconnaissance.","Technique"],
+  ["Reconnaissance","The initial phase of an attack where an attacker gathers information about a target.","Phase"],
+  ["Lateral Movement","Techniques used by attackers to progressively move through a network after initial compromise.","Technique"],
+  ["Privilege Escalation","Gaining higher-level permissions than originally granted, often used to access sensitive data or systems.","Attack"],
+  ["Persistence","Techniques attackers use to maintain access to systems across restarts and credential changes.","Technique"],
+  ["Exfiltration","The unauthorized transfer of data from a system to an external location controlled by an attacker.","Attack"],
+  ["C2","Command and Control — Infrastructure used by attackers to communicate with compromised systems.","Infrastructure"],
+  ["Botnet","A network of compromised computers (bots) controlled by an attacker, often used for DDoS or spam.","Threat"],
+  ["Rootkit","Malware that gains root-level access and hides its presence from the operating system and security tools.","Malware"],
+  ["Keylogger","Software or hardware that records keystrokes to capture sensitive information like passwords.","Malware"],
+  ["Spyware","Malware that secretly monitors user activity and collects information without consent.","Malware"],
+  ["Adware","Software that automatically displays or downloads advertising material, often bundled with free software.","Malware"],
+  ["Trojan","Malware disguised as legitimate software to trick users into installing it.","Malware"],
+  ["Worm","Self-replicating malware that spreads across networks without needing to attach to a host file.","Malware"],
+  ["Virus","Malicious code that attaches to legitimate programs and replicates when the host program is executed.","Malware"],
+  ["Logic Bomb","Malware that executes a malicious function when a specific condition or date is met.","Malware"],
+  ["Fileless Malware","Malware that operates in memory without writing to disk, making it harder to detect with traditional tools.","Malware"],
+  ["Polymorphic Malware","Malware that changes its code signature on each infection to evade signature-based detection.","Malware"],
+  ["GRC","Governance, Risk, and Compliance — An integrated framework for aligning IT with business goals while managing risk.","Framework"],
+  ["CIA Triad","Confidentiality, Integrity, and Availability — The three core principles of information security.","Framework"],
+  ["Confidentiality","Ensuring information is accessible only to those authorized to have access.","Principle"],
+  ["Integrity","Ensuring data is accurate, complete, and not altered by unauthorized parties.","Principle"],
+  ["Availability","Ensuring systems and data are accessible when needed by authorized users.","Principle"],
+  ["AAA","Authentication, Authorization, and Accounting — A framework for controlling access and tracking user activity.","Framework"],
+  ["Authentication","The process of verifying the identity of a user, device, or system.","Concept"],
+  ["Authorization","Determining what resources or actions an authenticated user is permitted to access or perform.","Concept"],
+  ["Accounting","Tracking and logging user activity for audit trails, billing, and security monitoring.","Concept"],
+  ["Patch Management","The process of identifying, testing, and deploying software updates to fix vulnerabilities.","Process"],
+  ["Change Management","A formal process for requesting, reviewing, and approving changes to IT systems.","Process"],
+  ["Configuration Management","Tracking and controlling changes to system configurations to maintain security and stability.","Process"],
+  ["Hardening","The process of reducing a system's attack surface by disabling unnecessary services and applying secure configurations.","Process"],
+  ["Baselining","Documenting the normal state of a system or network to detect deviations that may indicate a threat.","Process"],
+  ["Gap Analysis","Comparing the current security posture against a desired standard to identify areas needing improvement.","Assessment"],
+  ["Risk Assessment","Identifying and evaluating risks to determine their likelihood and potential impact.","Assessment"],
+  ["Threat Modeling","A structured process for identifying potential threats and vulnerabilities in a system during design.","Assessment"],
+  ["Chain of Custody","A documented, unbroken record of who handled evidence and when, ensuring its admissibility in legal proceedings.","Legal"],
+  ["Acceptable Use Policy","AUP — A policy defining the rules for using an organization's IT resources.","Policy"],
+  ["NDA","Non-Disclosure Agreement — A legal contract preventing parties from sharing confidential information.","Legal"],
+  ["SLA","Service Level Agreement — A contract defining the expected level of service between a provider and customer.","Legal"],
+  ["MOU","Memorandum of Understanding — A non-binding agreement outlining the terms of a cooperative relationship.","Legal"],
+  ["Data Classification","The process of categorizing data by sensitivity level to apply appropriate security controls.","Process"],
+  ["Data Sovereignty","The concept that data is subject to the laws and governance of the country in which it is collected or processed.","Concept"],
+  ["CASB","Cloud Access Security Broker — A security policy enforcement point between users and cloud service providers.","Technology"],
+  ["SASE","Secure Access Service Edge — A cloud architecture combining network security functions with WAN capabilities.","Architecture"],
+  ["SD-WAN","Software-Defined Wide Area Network — Uses software to control network connectivity and security across locations.","Technology"],
+  ["Containerization","Packaging an application with its dependencies in a container to ensure consistent deployment across environments.","Technology"],
+  ["Microservices","An architectural style structuring an application as small, independent services that communicate via APIs.","Architecture"],
+  ["IaC","Infrastructure as Code — Managing and provisioning infrastructure through machine-readable configuration files.","Technology"],
+  ["DevSecOps","Integrating security practices into the DevOps pipeline to address vulnerabilities earlier in development.","Practice"],
+  ["SDLC","Software Development Life Cycle — A process for planning, creating, testing, and deploying software.","Process"],
+  ["Threat Actor","An individual or group responsible for a cybersecurity incident or attack.","Concept"],
+  ["Attack Vector","The path or means by which an attacker gains access to a system to deliver a payload or malicious outcome.","Concept"],
+  ["Attack Surface","The total set of entry points where an unauthorized user can attempt to enter or extract data.","Concept"],
+  ["Exploit","Code or technique that takes advantage of a vulnerability to cause unintended behavior.","Concept"],
+  ["Payload","The component of malware that performs the malicious action after it has been delivered.","Concept"],
+  ["Vulnerability","A weakness in a system, application, or process that can be exploited by a threat actor.","Concept"],
+  ["Risk","The potential for loss or damage when a threat exploits a vulnerability, expressed as likelihood × impact.","Concept"],
+  ["Threat","Any circumstance or event with the potential to cause harm to an information system.","Concept"],
+  ["Control","A safeguard or countermeasure designed to reduce risk by protecting confidentiality, integrity, or availability.","Concept"],
+  ["Residual Risk","The risk that remains after security controls have been applied.","Concept"],
+  ["Risk Appetite","The amount of risk an organization is willing to accept in pursuit of its objectives.","Concept"],
+  ["Compensating Control","An alternative control used when a primary control cannot be implemented.","Control"],
+  ["Corrective Control","A control that fixes or remedies a problem after a security incident has occurred.","Control"],
+  ["Detective Control","A control that identifies and records security incidents or policy violations after they occur.","Control"],
+  ["Preventive Control","A control that stops security incidents from occurring in the first place.","Control"],
+  ["Deterrent Control","A control that discourages attackers from attempting a security breach.","Control"],
+  ["Physical Control","A tangible safeguard such as locks, badges, or cameras that restricts physical access.","Control"],
+  ["Technical Control","A control implemented through technology such as firewalls, encryption, or IDS.","Control"],
+  ["Administrative Control","A control implemented through policies, procedures, and training to manage behavior.","Control"],
+];
+
+// Build glossary map (term -> {def, type}) sorted by length descending
+const GLOSSARY = GLOSSARY_RAW
+  .sort((a,b) => b[0].length - a[0].length)
+  .map(([term, def, type]) => ({ term, def, type, re: new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})\\b`, 'gi') }));
+
+// ─── ACRONYM REGEX — matches 2-6 uppercase letters (optionally with digits/hyphens) ──
+const ACRONYM_RE = /\b([A-Z][A-Z0-9\-]{1,7})\b/g;
+
+// ─── AI ACRONYM CACHE — persists across renders ───────────────────────────────
+const _acronymCache = {};
+
+async function lookupAcronym(acronym) {
+  if (_acronymCache[acronym]) return _acronymCache[acronym];
+  // Check glossary first (instant)
+  const glossaryHit = GLOSSARY_RAW.find(([t]) => t.toUpperCase() === acronym.toUpperCase());
+  if (glossaryHit) {
+    const result = { term: glossaryHit[0], def: glossaryHit[1], type: glossaryHit[2], fromGlossary: true };
+    _acronymCache[acronym] = result;
+    return result;
+  }
+  // Otherwise ask Claude
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514", max_tokens:200,
+        messages:[{ role:"user", content:
+          `What does the acronym "${acronym}" mean in the context of CompTIA Security+ SY0-701 / cybersecurity?\n` +
+          `Respond ONLY with valid JSON (no markdown):\n{"term":"Full expanded name","def":"One concise sentence definition","type":"Category (e.g. Protocol, Tool, Framework, Attack, Standard, Concept)"}\n` +
+          `If "${acronym}" is not a cybersecurity acronym, respond with: {"term":"${acronym}","def":"Not a recognized cybersecurity acronym.","type":"Unknown"}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.find(b=>b.type==="text")?.text||"{}";
+    const parsed = JSON.parse(text.replace(/```json|```/g,"").trim());
+    _acronymCache[acronym] = parsed;
+    return parsed;
+  } catch {
+    const fallback = { term: acronym, def: "Could not load definition.", type: "Unknown" };
+    _acronymCache[acronym] = fallback;
+    return fallback;
+  }
+}
+
+// ─── GLOBAL TOOLTIP — simple DOM-based, zero React state issues ───────────────
+// We render it directly into a dedicated div outside React, avoiding all
+// cross-boundary setState / createPortal problems.
+
+const _ttEl = document.createElement('div');
+_ttEl.id = 'tt-root';
+document.body.appendChild(_ttEl);
+
+function showTooltip(data) {
+  // data: { x, y, term, def, type, loading, acronym } | null
+  if (!data) { _ttEl.innerHTML = ''; return; }
+
+  const { x, y, term, def, type, loading, acronym } = data;
+
+  const safeStr = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  _ttEl.innerHTML = `
+    <div id="tt-bubble" style="
+      position:fixed;left:${x}px;top:${y}px;z-index:9999;
+      max-width:290px;min-width:180px;
+      background:#1e2436;border:1px solid rgba(165,180,252,.3);
+      border-radius:12px;padding:13px 15px;
+      box-shadow:0 16px 48px rgba(0,0,0,.65),0 0 0 1px rgba(165,180,252,.07);
+      font-family:'Inter',system-ui,sans-serif;
+    ">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:${loading?0:6}px">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#a5b4fc;display:flex;align-items:center;gap:6px">
+          <span style="width:5px;height:5px;border-radius:50%;background:#a5b4fc;display:inline-block;flex-shrink:0"></span>
+          ${loading
+            ? `<span style="display:flex;align-items:center;gap:7px">
+                <span style="width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(165,180,252,.3);border-top-color:#a5b4fc;display:inline-block;animation:spin .7s linear infinite"></span>
+                Looking up ${safeStr(acronym)}…
+               </span>`
+            : safeStr(term)
+          }
+        </div>
+        <button id="tt-close" style="background:none;border:none;color:#4a6070;cursor:pointer;font-size:18px;line-height:1;flex-shrink:0;padding:0 0 0 4px;font-family:inherit">×</button>
+      </div>
+      ${!loading ? `
+        <div style="font-size:13px;line-height:1.55;color:#e2e8f0;margin-bottom:7px">${safeStr(def)}</div>
+        <div style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#64748b">${safeStr(type)}</div>
+      ` : ''}
+    </div>`;
+
+  document.getElementById('tt-close').onclick = (e) => { e.stopPropagation(); showTooltip(null); };
+}
+
+// Close on background click
+document.addEventListener('click', () => showTooltip(null));
+
+// Keep GlobalTooltip as a no-op React component (App still renders it)
+function GlobalTooltip() { return null; }
+
+// ─── PARSE TEXT → SEGMENTS ────────────────────────────────────────────────────
+function parseSegments(text) {
+  if (!text) return [];
+  const matched = [];
+
+  // 1. Glossary terms (multi-word + single, pre-sorted longest first)
+  for (const entry of GLOSSARY) {
+    let m;
+    entry.re.lastIndex = 0;
+    while ((m = entry.re.exec(text)) !== null) {
+      const start = m.index, end = m.index + m[0].length;
+      if (!matched.some(x => start < x.end && end > x.start))
+        matched.push({ start, end, word: m[0], def: entry.def, type: entry.type, term: entry.term, isAcronym: false });
+    }
+  }
+
+  // 2. Any remaining uppercase acronym not already covered
+  let ma;
+  ACRONYM_RE.lastIndex = 0;
+  while ((ma = ACRONYM_RE.exec(text)) !== null) {
+    const start = ma.index, end = ma.index + ma[0].length;
+    // Skip if already matched by glossary
+    if (matched.some(x => start < x.end && end > x.start)) continue;
+    // Skip very common non-acronym uppercase words
+    const skip = new Set(["I","A","OK","OR","IF","AND","BUT","NOT","THE","FOR","ARE","WAS","HAS","HAD","ITS","CAN","MAY","GET"]);
+    if (skip.has(ma[0])) continue;
+    matched.push({ start, end, word: ma[0], term: ma[0], def: null, type: null, isAcronym: true });
+  }
+
+  matched.sort((a,b) => a.start - b.start);
+
+  const parts = [];
+  let cursor = 0;
+  for (const m of matched) {
+    if (m.start > cursor) parts.push({ kind:'text', content: text.slice(cursor, m.start) });
+    parts.push({ kind:'term', ...m });
+    cursor = m.end;
+  }
+  if (cursor < text.length) parts.push({ kind:'text', content: text.slice(cursor) });
+  return parts;
+}
+
+// ─── RICH TEXT ────────────────────────────────────────────────────────────────
+function RichText({ text, style, className, tag = "span" }) {
+  if (!text) return null;
+  const parts = parseSegments(text);
+
+  const handleActivate = async (e, item) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    let x = rect.left;
+    let y = rect.bottom + 10;
+    if (x + 300 > window.innerWidth) x = Math.max(8, window.innerWidth - 305);
+    if (y + 160 > window.innerHeight) y = Math.max(8, rect.top - 168);
+
+    if (!item.isAcronym) {
+      // Known glossary term — show immediately, no fetch needed
+      showTooltip({ x, y, term: item.term, def: item.def, type: item.type, loading: false });
+    } else {
+      // Unknown acronym — show spinner, then fill in after fetch
+      const tag = item.word;
+      showTooltip({ x, y, acronym: tag, term: null, def: null, type: null, loading: true });
+      const result = await lookupAcronym(tag);
+      // Only update if the bubble is still showing the same acronym
+      const bubble = document.getElementById('tt-bubble');
+      if (bubble) {
+        showTooltip({ x, y, term: result.term, def: result.def, type: result.type, loading: false });
+      }
+    }
+  };
+
+  const children = parts.map((p, i) =>
+    p.kind === 'text'
+      ? p.content
+      : <span
+          key={i}
+          className={`term${p.isAcronym ? " term-acronym" : ""}`}
+          onClick={e => handleActivate(e, p)}
+          onMouseEnter={e => handleActivate(e, p)}
+        >{p.content}</span>
+  );
+
+  return React.createElement(tag, { style, className }, ...children);
+}
+
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const DOMAINS = [
+  { id:"threats",        short:"Threats",        label:"Threats, Attacks & Vulnerabilities", pct:"24%", icon:"⚡", color:"#f87171" },
+  { id:"architecture",   short:"Architecture",   label:"Architecture & Design",              pct:"21%", icon:"🏗️", color:"#a78bfa" },
+  { id:"implementation", short:"Implementation", label:"Implementation",                     pct:"25%", icon:"⚙️", color:"#22d3ee" },
+  { id:"operations",     short:"Operations",     label:"Operations & Incident Response",     pct:"16%", icon:"🔍", color:"#fbbf24" },
+  { id:"governance",     short:"Governance",     label:"Governance, Risk & Compliance",      pct:"14%", icon:"📜", color:"#34d399" },
+];
+
+const PRESET = {
+  threats:["Malware Types & Indicators","Social Engineering","Application Vulnerabilities","Network Attacks","Cryptographic Attacks","Password Attacks","Physical Attacks","Threat Intelligence","Vulnerability Scanning","Penetration Testing","Ransomware","Insider Threats","Zero-Day Exploits","SQL Injection","XSS","MitM Attacks","DDoS","DNS Poisoning","Session Hijacking","Supply Chain Attacks"],
+  architecture:["Enterprise Architecture","Cloud Security Models","Virtualization Security","Zero Trust","Network Segmentation","Secure Topologies","IAM","Authentication Protocols","PKI & Certificates","Cryptography Fundamentals","Wireless Security","Endpoint Security","IoT Security","Mobile Security","Data Privacy","Resiliency & Redundancy","Secure App Design","API Security","Containerization","SD-WAN & SASE"],
+  implementation:["Firewall Config","IDS/IPS Deployment","VPN Technologies","Secure Protocols (TLS/SSH)","Email Security (SPF/DKIM/DMARC)","DNSSEC","MFA","Privileged Access Management","EDR","SIEM","Data Loss Prevention","Patch Management","System Hardening","Secure Baselines","Network Access Control","WAF","Certificate Authority Setup","Key Management","Wireless Security Impl","Cloud Security Controls"],
+  operations:["Incident Response Lifecycle","Digital Forensics","Log Analysis & SIEM","Threat Hunting","Vulnerability Management","Security Automation & SOAR","Business Continuity","Disaster Recovery","Backup & Restore","Chain of Custody","Network Traffic Analysis","Endpoint Forensics","Malware Analysis","Containment & Eradication","Post-Incident Review","Memory Forensics","IOC Identification","Alert Triage","Tabletop Exercises","Security Awareness"],
+  governance:["Risk Management Framework","Risk Assessment","Security Policies","HIPAA & PCI-DSS","GDPR & Data Privacy","NIST CSF","ISO 27001","Vendor Risk Management","Data Classification","Security Awareness Programs","Audit & Accountability","Legal Compliance","Business Impact Analysis","Privacy Controls","Third-Party Risk","Control Frameworks","Security Metrics","GRC Tools","Ethics in Cybersecurity","Contractual Requirements"],
+};
+
+const MODES = [
+  { id:"flashcards", label:"Flashcards",  icon:"🃏" },
+  { id:"cheatsheet", label:"Cheat Sheet", icon:"📋" },
+  { id:"quiz",       label:"Quiz",        icon:"🎯" },
+];
+
+const shuffle = arr => { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pick10  = (id, excl=[]) => { const all=PRESET[id]||[]; const av=all.filter(t=>!excl.includes(t)); return shuffle(av.length>=10?av:all).slice(0,10); };
+
+// ─── API ─────────────────────────────────────────────────────────────────────
+const buildPrompt = (mode, domain, topic) => {
+  const d = DOMAINS.find(x=>x.id===domain)?.label||domain;
+  const base = `You are a CompTIA Security+ SY0-701 expert. Domain: "${d}", Topic: "${topic}". Be concise, accurate. Use real SY0-701 exam language. Reference CompTIA objectives, NIST SP 800-53, ISO 27001, OWASP Top 10.`;
+  if(mode==="flashcards") return `${base}\n\nGenerate exactly 6 flashcards about "${topic}". Respond ONLY with a valid JSON array (no markdown):\n[{"front":"term","back":"definition","examWatch":"one-line exam tip or null"}]\nInclude at least 2 non-null examWatch values.`;
+  if(mode==="cheatsheet") return `${base}\n\nCheat sheet for "${topic}". Respond ONLY with valid JSON (no markdown):\n{"summary":"2-3 sentences","keyPoints":["p1","p2","p3","p4","p5"],"mnemonic":{"phrase":"phrase","breakdown":[{"letter":"X","stands":"Word"}]},"examWatch":["tip1","tip2","tip3"]}`;
+  if(mode==="quiz")       return `${base}\n\nGenerate exactly 5 situational MCQs about "${topic}" in CompTIA SY0-701 style (best answer). Respond ONLY with valid JSON array (no markdown):\n[{"q":"question","options":["A. ...","B. ...","C. ...","D. ..."],"correct":0,"explanation":"Why A is correct and why B/C/D are wrong"}]`;
+};
+
+async function callClaude(prompt) {
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,messages:[{role:"user",content:prompt}]}),
+  });
+  const data = await res.json();
+  const text = data.content?.find(b=>b.type==="text")?.text||"";
+  return JSON.parse(text.replace(/```json|```/g,"").trim());
+}
+
+async function aiTopics(domain, excl) {
+  const d = DOMAINS.find(x=>x.id===domain)?.label||domain;
+  return callClaude(`List 10 specific SY0-701 exam topics for "${d}" NOT in this list: ${excl.join(", ")}.\nRespond ONLY with a JSON array of strings (no markdown):\n["Topic 1","Topic 2",...]`);
+}
+
+// ─── ATOMS ────────────────────────────────────────────────────────────────────
+function Spinner({label="Generating…"}) {
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,padding:"52px 0"}}>
+      <div className="spinner"/>
+      <p style={{fontSize:13,color:"var(--muted)",letterSpacing:".04em"}}>{label}</p>
+    </div>
+  );
+}
+function Err({msg,onRetry}) {
+  return (
+    <div style={{textAlign:"center",padding:"40px 0"}}>
+      <div style={{fontSize:36,marginBottom:12}}>⚠️</div>
+      <p style={{fontSize:14,color:"var(--red)",marginBottom:20,lineHeight:1.5}}>{msg}</p>
+      <button className="btn btn-ghost" onClick={onRetry}>Try Again</button>
+    </div>
+  );
+}
+function ScoreBar({scores}) {
+  const tot=scores.correct+scores.wrong, pct=tot===0?0:Math.round((scores.correct/tot)*100);
+  const col=pct>=70?"var(--green)":pct>=50?"var(--yellow)":"var(--red)";
+  return (
+    <div className="score-row">
+      <span style={{fontSize:13,fontWeight:600,color:"var(--green)",whiteSpace:"nowrap"}}>✓ {scores.correct}</span>
+      <span style={{fontSize:13,fontWeight:600,color:"var(--red)",whiteSpace:"nowrap"}}>✗ {scores.wrong}</span>
+      <div className="score-track"><div className="score-fill" style={{width:`${pct}%`,background:col}}/></div>
+      <span style={{fontSize:12,fontWeight:700,color:col,whiteSpace:"nowrap"}}>{pct}%</span>
+    </div>
+  );
+}
+
+// ─── LEGEND INDICATOR ─────────────────────────────────────────────────────────
+function TermLegend() {
+  return (
+    <div style={{display:"inline-flex",alignItems:"center",gap:10,padding:"5px 12px",borderRadius:20,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.08)",fontSize:12,flexWrap:"wrap"}}>
+      <span style={{display:"inline-flex",alignItems:"center",gap:5,color:"#a5b4fc"}}>
+        <span style={{borderBottom:"1px dotted rgba(165,180,252,.6)",color:"#a5b4fc",fontSize:12}}>term</span>
+        <span style={{color:"var(--muted)"}}>= glossary</span>
+      </span>
+      <span style={{color:"rgba(255,255,255,.15)"}}>·</span>
+      <span style={{display:"inline-flex",alignItems:"center",gap:5,color:"#fbbf24"}}>
+        <span style={{borderBottom:"1px dotted rgba(251,191,36,.6)",color:"#fbbf24",fontSize:12}}>ACRONYM</span>
+        <span style={{color:"var(--muted)"}}>= tap to expand</span>
+      </span>
+    </div>
+  );
+}
+
+// ─── FLASHCARDS ───────────────────────────────────────────────────────────────
+function Flashcards({domain,topic,scores,setScores}) {
+  const [cards,setCards]=useState(null);
+  const [idx,setIdx]=useState(0);
+  const [flipped,setFlipped]=useState(false);
+  const [fading,setFading]=useState(false);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+
+  const load=useCallback(async()=>{
+    setLoading(true);setError(null);setCards(null);setIdx(0);setFlipped(false);
+    try{setCards(await callClaude(buildPrompt("flashcards",domain,topic)));}
+    catch{setError("Couldn't generate flashcards. Check your connection.");}
+    setLoading(false);
+  },[domain,topic]);
+  useEffect(()=>{load();},[load]);
+
+  const flip=()=>{if(fading)return;setFading(true);setTimeout(()=>{setFlipped(f=>!f);setFading(false);},120);};
+  const next=(ok)=>{
+    setScores(s=>({...s,correct:s.correct+(ok?1:0),wrong:s.wrong+(ok?0:1)}));
+    setFlipped(false);
+    setTimeout(()=>setIdx(i=>(i+1)%cards.length),180);
+  };
+
+  if(loading) return <Spinner label="Building flashcards…"/>;
+  if(error)   return <Err msg={error} onRetry={load}/>;
+  if(!cards?.length) return null;
+  const card=cards[idx];
+
+  return (
+    <div className="anim-up" style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div className="dot-row">{cards.map((_,i)=><div key={i} className="dot" style={{width:i===idx?22:8,background:i===idx?"var(--accent)":"var(--border2)"}}/>)}</div>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}>
+          <TermLegend/>
+          <button className="btn btn-ghost" style={{padding:"6px 14px",fontSize:12}} onClick={load}>↻ New Set</button>
+        </div>
+      </div>
+
+      <div className={`flashcard ${flipped?"back":"front"}`} style={{opacity:fading?0:1,transition:"opacity .12s"}} onClick={flip}>
+        <p style={{fontSize:11,fontWeight:700,letterSpacing:".08em",textTransform:"uppercase",color:flipped?"var(--green)":"var(--accent-h)",marginBottom:12}}>
+          {flipped?"📖 Definition":"🔤 Term"}
+        </p>
+        <RichText text={flipped?card.back:card.front} style={{fontSize:flipped?15:20,fontWeight:flipped?400:700,color:"var(--white)",lineHeight:1.55,letterSpacing:flipped?0:"-.01em",display:"block"}} tag="div"/>
+        {flipped && card.examWatch && (
+          <div style={{marginTop:20,padding:"12px 14px",borderRadius:10,background:"rgba(245,158,11,.08)",border:"1px solid rgba(245,158,11,.22)",display:"flex",gap:10,alignItems:"flex-start"}}>
+            <span style={{fontSize:15,flexShrink:0}}>⚡</span>
+            <div>
+              <p style={{fontSize:10,fontWeight:700,letterSpacing:".08em",textTransform:"uppercase",color:"var(--yellow)",marginBottom:4}}>Exam Watch</p>
+              <RichText text={card.examWatch} style={{fontSize:13,color:"var(--text)",lineHeight:1.55,display:"block"}} tag="div"/>
+            </div>
+          </div>
+        )}
+        <p style={{fontSize:12,color:"var(--muted)",marginTop:18,textAlign:"center"}}>click to {flipped?"see term":"reveal answer"}</p>
+      </div>
+
+      {flipped?(
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <button className="btn btn-danger" style={{padding:"14px",fontSize:14}} onClick={()=>next(false)}>✗ Still Learning</button>
+          <button className="btn btn-success" style={{padding:"14px",fontSize:14}} onClick={()=>next(true)}>✓ Got It</button>
+        </div>
+      ):(
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <button className="btn btn-ghost" onClick={()=>{setFlipped(false);setIdx(i=>i===0?cards.length-1:i-1);}}>← Prev</button>
+          <button className="btn btn-ghost" onClick={()=>{setFlipped(false);setIdx(i=>(i+1)%cards.length);}}>Next →</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── CHEAT SHEET ──────────────────────────────────────────────────────────────
+function CheatSheet({domain,topic}) {
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+
+  const load=useCallback(async()=>{
+    setLoading(true);setError(null);setData(null);
+    try{setData(await callClaude(buildPrompt("cheatsheet",domain,topic)));}
+    catch{setError("Couldn't generate cheat sheet.");}
+    setLoading(false);
+  },[domain,topic]);
+  useEffect(()=>{load();},[load]);
+
+  if(loading) return <Spinner label="Building cheat sheet…"/>;
+  if(error)   return <Err msg={error} onRetry={load}/>;
+  if(!data)   return null;
+
+  return (
+    <div className="anim-up" style={{display:"flex",flexDirection:"column",gap:12}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+        <TermLegend/>
+        <button className="btn btn-ghost" style={{padding:"6px 14px",fontSize:12}} onClick={load}>↻ Regenerate</button>
+      </div>
+
+      {/* Summary */}
+      <div className="card card-p" style={{background:"linear-gradient(135deg,rgba(99,102,241,.07),var(--card))"}}>
+        <p className="section-label" style={{marginBottom:10,color:"#818cf8"}}>📌 Overview</p>
+        <RichText text={data.summary} style={{fontSize:14,lineHeight:1.75,color:"var(--text)",display:"block"}} tag="div"/>
+      </div>
+
+      {/* Key points */}
+      <div className="card">
+        <div className="card-p" style={{paddingBottom:8}}>
+          <p className="section-label" style={{color:"var(--purple)"}}>🔑 Key Concepts</p>
+        </div>
+        <div className="divider"/>
+        <div style={{padding:"8px 20px 16px"}}>
+          {data.keyPoints?.map((pt,i)=>(
+            <div key={i} style={{display:"flex",gap:14,padding:"12px 0",borderBottom:i<data.keyPoints.length-1?"1px solid var(--border)":"none"}}>
+              <div style={{width:26,height:26,borderRadius:7,background:"rgba(168,85,247,.12)",border:"1px solid rgba(168,85,247,.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:"var(--purple)",flexShrink:0}}>{i+1}</div>
+              <RichText text={pt} style={{fontSize:14,lineHeight:1.6,color:"var(--text)",paddingTop:3,display:"block"}} tag="div"/>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mnemonic */}
+      {data.mnemonic&&(
+        <div className="card card-p" style={{background:"linear-gradient(135deg,rgba(34,197,94,.06),var(--card))"}}>
+          <p className="section-label" style={{marginBottom:12,color:"var(--green)"}}>🧠 Memory Device</p>
+          <p style={{fontSize:20,fontWeight:800,color:"var(--green)",letterSpacing:"-.01em",marginBottom:14}}>"{data.mnemonic.phrase}"</p>
+          <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+            {data.mnemonic.breakdown?.map((b,i)=>(
+              <span key={i} className="mnem-chip"><strong>{b.letter}</strong> <span style={{color:"var(--muted2)",fontWeight:400,fontSize:12}}>→ {b.stands}</span></span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Exam Watch */}
+      <div className="card card-p">
+        <p className="section-label" style={{marginBottom:12,color:"var(--yellow)"}}>⚡ Exam Watch Tips</p>
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {data.examWatch?.map((tip,i)=>(
+            <div key={i} className="exam-tip">
+              <span style={{flexShrink:0,fontSize:15}}>💡</span>
+              <RichText text={tip} tag="div" style={{display:"block"}}/>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── QUIZ ─────────────────────────────────────────────────────────────────────
+function Quiz({domain,topic,scores,setScores}) {
+  const [qs,setQs]=useState(null);
+  const [cur,setCur]=useState(0);
+  const [sel,setSel]=useState(null);
+  const [rev,setRev]=useState(false);
+  const [done,setDone]=useState(false);
+  const [sess,setSess]=useState({c:0,w:0});
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+
+  const load=useCallback(async()=>{
+    setLoading(true);setError(null);setQs(null);
+    setCur(0);setSel(null);setRev(false);setDone(false);setSess({c:0,w:0});
+    try{setQs(await callClaude(buildPrompt("quiz",domain,topic)));}
+    catch{setError("Couldn't generate quiz.");}
+    setLoading(false);
+  },[domain,topic]);
+  useEffect(()=>{load();},[load]);
+
+  const submit=()=>{
+    if(sel===null)return;setRev(true);
+    const ok=sel===qs[cur].correct;
+    setSess(s=>({c:s.c+(ok?1:0),w:s.w+(ok?0:1)}));
+    setScores(s=>({correct:s.correct+(ok?1:0),wrong:s.wrong+(ok?0:1)}));
+  };
+  const next=()=>{if(cur+1>=qs.length){setDone(true);return;}setCur(c=>c+1);setSel(null);setRev(false);};
+
+  if(loading) return <Spinner label="Generating quiz…"/>;
+  if(error)   return <Err msg={error} onRetry={load}/>;
+  if(!qs?.length) return null;
+
+  if(done){
+    const pct=Math.round((sess.c/qs.length)*100);
+    const col=pct>=80?"var(--green)":pct>=60?"var(--yellow)":"var(--red)";
+    return (
+      <div className="anim-up" style={{textAlign:"center",padding:"32px 0"}}>
+        <div style={{fontSize:48,marginBottom:16}}>{pct>=80?"🏆":pct>=60?"📈":"📚"}</div>
+        <div className="result-pct" style={{color:col,marginBottom:8}}>{pct}<span style={{fontSize:40}}>%</span></div>
+        <p style={{fontSize:14,color:"var(--muted)",marginBottom:6}}>{sess.c} correct · {sess.w} wrong of {qs.length}</p>
+        <p style={{fontSize:13,color:"var(--muted)",marginBottom:28,lineHeight:1.6}}>
+          {pct>=80?"Excellent — you've mastered this topic!":pct>=60?"Good progress — review the ones you missed.":"Study the Cheat Sheet first, then try again."}
+        </p>
+        <button className="btn btn-primary" style={{padding:"13px 28px",fontSize:15}} onClick={load}>Try Again</button>
+      </div>
+    );
+  }
+
+  const q=qs[cur];
+  const optClass=(i)=>{let c="opt";if(rev)c+=" locked";if(rev&&i===q.correct)c+=" correct";else if(rev&&i===sel)c+=" wrong";else if(!rev&&i===sel)c+=" selected";return c;};
+
+  return (
+    <div className="anim-up" style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+        <p style={{fontSize:13,fontWeight:500,color:"var(--muted)"}}>Q {cur+1} of {qs.length} · ✓ {sess.c} · ✗ {sess.w}</p>
+        <TermLegend/>
+      </div>
+      <div className="prog"><div className="prog-fill" style={{width:`${(cur/qs.length)*100}%`}}/></div>
+
+      <div className="card card-p">
+        <p className="section-label" style={{marginBottom:10,color:"var(--accent-h)"}}>Question</p>
+        <RichText text={q.q} style={{fontSize:15,lineHeight:1.7,color:"var(--white)",fontWeight:500,display:"block"}} tag="div"/>
+      </div>
+
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+        {q.options.map((opt,i)=>(
+          <div key={i} className={optClass(i)} onClick={()=>!rev&&setSel(i)} style={{cursor:rev?"default":"pointer"}}>
+            <div className="opt-letter">{["A","B","C","D"][i]}</div>
+            <RichText text={opt.slice(3)} style={{fontSize:14,lineHeight:1.55,color:rev?(i===q.correct?"var(--green)":i===sel?"var(--red)":"var(--muted2)"):(i===sel?"#818cf8":"var(--text)"),fontWeight:i===sel||i===q.correct?500:400,display:"block"}} tag="div"/>
+          </div>
+        ))}
+      </div>
+
+      {rev&&(
+        <div className="card anim-in" style={{borderTop:`2px solid ${sel===q.correct?"var(--green)":"var(--red)"}`,padding:18}}>
+          <p className="section-label" style={{marginBottom:8,color:sel===q.correct?"var(--green)":"var(--red)"}}>
+            {sel===q.correct?"✓ Correct!":"✗ Incorrect"}
+          </p>
+          <RichText text={q.explanation} style={{fontSize:14,lineHeight:1.65,color:"var(--text)",display:"block"}} tag="div"/>
+        </div>
+      )}
+
+      {!rev
+        ?<button className="btn btn-primary" style={{width:"100%",padding:"15px",fontSize:15}} disabled={sel===null} onClick={submit}>Submit Answer</button>
+        :<button className="btn btn-primary" style={{width:"100%",padding:"15px",fontSize:15}} onClick={next}>{cur+1>=qs.length?"See Results →":"Next Question →"}</button>
+      }
+    </div>
+  );
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────────────────
+function Home({scores,setScores}) {
+  const [mode,setMode]=useState("flashcards");
+  const [activeDomain,setActiveDomain]=useState(null);
+  const [chips,setChips]=useState([]);
+  const [seen,setSeen]=useState([]);
+  const [topic,setTopic]=useState("");
+  const [view,setView]=useState(null);
+  const [shuffling,setShuffling]=useState(false);
+  const inputRef=useRef(null);
+
+  useEffect(()=>{
+    if(!activeDomain){setChips([]);return;}
+    const next=pick10(activeDomain,[]);
+    setChips(next);setSeen(next);
+  },[activeDomain]);
+
+  const handleShuffle=async()=>{
+    if(!activeDomain)return;
+    setShuffling(true);
+    const all=PRESET[activeDomain]||[];
+    if(seen.length>=all.length-4){
+      try{const ai=await aiTopics(activeDomain,seen);const next=ai.slice(0,10);setChips(next);setSeen(s=>[...s,...next]);setShuffling(false);return;}catch{}
+    }
+    const next=pick10(activeDomain,seen);setChips(next);setSeen(s=>[...s,...next]);setShuffling(false);
+  };
+
+  const handleGenerate=()=>{
+    if(!topic.trim())return;
+    setView({mode,domain:activeDomain||"threats",topic:topic.trim()});
+  };
+
+  if(view){
+    return (
+      <div className="anim-up">
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:24,flexWrap:"wrap"}}>
+          <button className="btn btn-ghost" style={{padding:"8px 14px",fontSize:13}} onClick={()=>setView(null)}>← Back</button>
+          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <span className="pill pill-accent">{DOMAINS.find(d=>d.id===view.domain)?.icon} {DOMAINS.find(d=>d.id===view.domain)?.short||"All"}</span>
+            <span style={{fontSize:13,fontWeight:600,color:"var(--white)"}}>{view.topic}</span>
+          </div>
+          <div style={{marginLeft:"auto",display:"flex",gap:6,flexWrap:"wrap"}}>
+            {MODES.map(m=>(
+              <button key={m.id} className={`btn ${view.mode===m.id?"btn-primary":"btn-ghost"}`}
+                style={{padding:"7px 14px",fontSize:12,borderRadius:9}}
+                onClick={()=>setView(v=>({...v,mode:m.id}))}>
+                {m.icon} {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {view.mode==="flashcards"&&<Flashcards key={`${view.domain}-${view.topic}-fc`} domain={view.domain} topic={view.topic} scores={scores} setScores={setScores}/>}
+        {view.mode==="cheatsheet"&&<CheatSheet key={`${view.domain}-${view.topic}-cs`} domain={view.domain} topic={view.topic}/>}
+        {view.mode==="quiz"      &&<Quiz       key={`${view.domain}-${view.topic}-qz`} domain={view.domain} topic={view.topic} scores={scores} setScores={setScores}/>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="anim-up" style={{display:"flex",flexDirection:"column",gap:24}}>
+      {/* Hero */}
+      <div style={{textAlign:"center",paddingTop:12}}>
+        <h1 style={{fontSize:"clamp(28px,5vw,46px)",fontWeight:900,color:"var(--white)",letterSpacing:"-.03em",lineHeight:1.08,marginBottom:12}}>
+          Master Security+ <span style={{background:"linear-gradient(135deg,#6366f1,#22d3ee)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>faster.</span>
+        </h1>
+        <p style={{fontSize:15,color:"var(--muted2)",lineHeight:1.6,maxWidth:460,margin:"0 auto"}}>
+          Pick a study mode, choose a topic, and let AI build your study materials instantly.
+        </p>
+      </div>
+
+      {/* Score */}
+      {scores.correct+scores.wrong>0&&(
+        <div className="card card-p" style={{display:"flex",alignItems:"center",gap:16,justifyContent:"space-between",flexWrap:"wrap"}}>
+          <div style={{flex:1,minWidth:200}}><ScoreBar scores={scores}/></div>
+          <button className="btn btn-ghost" style={{fontSize:12,padding:"7px 14px"}} onClick={()=>setScores({correct:0,wrong:0})}>Reset</button>
+        </div>
+      )}
+
+      {/* Main card */}
+      <div className="card">
+        {/* Mode selector */}
+        <div className="card-p" style={{paddingBottom:20}}>
+          <div className="mode-grid">
+            {MODES.map(m=>(
+              <button key={m.id} className={`mode-btn${mode===m.id?" active":""}`} onClick={()=>setMode(m.id)}>
+                <div className="mode-icon">{m.icon}</div>
+                <span className="mode-label">{m.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="divider"/>
+        <div className="card-p" style={{display:"flex",flexDirection:"column",gap:16}}>
+          {/* Domain filter */}
+          <div>
+            <p className="section-label" style={{marginBottom:10}}>Domain <span style={{color:"var(--border2)"}}>optional</span></p>
+            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+              {DOMAINS.map(d=>(
+                <button key={d.id} className={`domain-badge${activeDomain===d.id?" active":""}`}
+                  onClick={()=>setActiveDomain(a=>a===d.id?null:d.id)}>
+                  <span>{d.icon}</span>{d.short}
+                  <span style={{fontSize:11,color:activeDomain===d.id?"#818cf8":"var(--muted)",fontWeight:700}}>{d.pct}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Chips */}
+          {chips.length>0&&(
+            <div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                <p className="section-label">Suggested Topics</p>
+                <button className="btn btn-ghost" style={{padding:"5px 12px",fontSize:12,display:"flex",alignItems:"center",gap:6,borderRadius:8}}
+                  disabled={shuffling} onClick={handleShuffle}>
+                  <span style={{display:"inline-block",animation:shuffling?"spin .6s linear infinite":"none",fontSize:14}}>⟳</span>
+                  {shuffling?"Loading…":"Shuffle"}
+                </button>
+              </div>
+              <div className="chips">
+                {chips.map(t=>(
+                  <button key={t} className={`chip${topic===t?" active":""}`} onClick={()=>setTopic(t)}>{t}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input */}
+          <div>
+            <p className="section-label" style={{marginBottom:10}}>Security+ Topic</p>
+            <input ref={inputRef} className="topic-input"
+              placeholder="e.g. Zero Trust, MFA, PKI, SQL Injection…"
+              value={topic} onChange={e=>setTopic(e.target.value)}
+              onKeyDown={e=>e.key==="Enter"&&handleGenerate()}/>
+          </div>
+
+          {/* Generate */}
+          <button className="gen-btn" disabled={!topic.trim()} onClick={handleGenerate}>
+            <span style={{fontSize:18}}>⚡</span> Generate
+          </button>
+        </div>
+      </div>
+
+      {/* Tip */}
+      <div className="exam-tip">
+        <span style={{fontSize:16,flexShrink:0}}>⚡</span>
+        <div><strong style={{color:"var(--yellow)"}}>Exam Watch:</strong> Implementation (25%) and Threats (24%) make up nearly half the exam. Prioritize these domains first.</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [scores,setScores]=useState({correct:0,wrong:0});
+  return (
+    <>
+      <GlobalTooltip/>
+      <nav className="navbar">
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#4f46e5,#6366f1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🛡️</div>
+          <div>
+            <div style={{fontSize:15,fontWeight:800,color:"var(--white)",lineHeight:1}}>Security+ Sentinel</div>
+            <div style={{fontSize:11,color:"var(--muted)",letterSpacing:".04em"}}>SY0-701 Study System</div>
+          </div>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,padding:"6px 14px",borderRadius:20,background:"rgba(99,102,241,.12)",border:"1px solid rgba(99,102,241,.3)"}}>
+            <div className="gdot"/>
+            <span style={{fontSize:12,fontWeight:600,color:"#818cf8"}}>AI Powered</span>
+          </div>
+        </div>
+      </nav>
+      <main style={{maxWidth:680,margin:"0 auto",padding:"28px 16px 80px",width:"100%"}}>
+        <Home scores={scores} setScores={setScores}/>
+      </main>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
